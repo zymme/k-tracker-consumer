@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd">
+	<flow name="kids-tracker-consumer:behavior-impl" doc:id="15b60f09-340f-4cee-b7b2-700945e7824b" >
+		<amqp:listener doc:name="Listener" doc:id="79cdfa49-58bf-47a6-9468-799a517037c7" config-ref="AMQP_Config" queueName="${behavior.queue}" outputMimeType="application/json"/>
+		<logger level="INFO" doc:name="Log payload" doc:id="9bbcac8b-a7c9-4bfe-a0eb-ae749abb9cda" message="#[payload]"/>
+		<mongo:insert-document doc:name="Insert document" doc:id="d538d912-6d16-4c0b-92eb-47b7ede6e21d" config-ref="MongoDB_Config" collectionName="behavior"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b380171b-681b-4efc-bcc0-f547a3347cd0" message="#['after Insert document mongo call ' ++ payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="55b6cf33-27ee-43b0-8cbb-47d902160238" >
+				<logger level="INFO" doc:name="Logger" doc:id="25bfea60-f869-4300-85e2-39efab4e3950" message="#[error.description]"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
